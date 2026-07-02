@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /createapost
+Disallow: /edit/
+Disallow: /profile
+Disallow: /*?*auth_token=
+
+Sitemap: https://readxhub.in/sitemap.xml
+Host: readxhub.in

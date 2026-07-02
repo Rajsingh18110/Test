@@ -1,0 +1,97 @@
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import DOMPurify from "dompurify";
+import "../styles/BlogDetail.css";
+import CommentBox from "../components/CommentBox";
+
+const BlogDetails = () => {
+  const { id } = useParams(); // ✅ Get ID from URL
+  const [blog, setBlog] = useState(null);
+
+  useEffect(() => {
+    fetch(`https://blogs.readxhub.in/fetch_single_blog.php?id=${id}`)
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Fetched Blog Details:", data); // ✅ Debugging
+        setBlog(data);
+      })
+      .catch((error) => console.error("Error fetching blog details:", error));
+  }, [id]);
+
+  if (!blog) {
+    return <p>Loading blog details...</p>;
+  }
+
+  const shareUrl = window.location.href;
+  const encodedTitle = encodeURIComponent(blog.title);
+
+  return (
+    <>
+    <div className="blog-details">
+      <h2>{blog.title}</h2>
+      <div
+        className="blog-content"
+        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(blog.content) }}
+      />
+      <span className="date">{new Date(blog.created_at).toDateString()}</span>
+      <span className="date">Author: {blog.author}</span>
+
+      {/* ✅ Share Buttons */}
+      <div className="share-buttons">
+        <a
+          href={`https://wa.me/?text=${encodedTitle} - ${shareUrl}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="share-btn whatsapp"
+        >
+          WhatsApp
+        </a>
+        <a
+          href={`https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="share-btn facebook"
+        >
+          Facebook
+        </a>
+        <a
+          href={`https://twitter.com/intent/tweet?url=${shareUrl}&text=${encodedTitle}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="share-btn twitter"
+        >
+          Twitter
+        </a>
+        <a
+          href={`https://www.linkedin.com/shareArticle?url=${shareUrl}&title=${encodedTitle}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="share-btn linkedin"
+        >
+          LinkedIn
+        </a>
+        <a
+          href={`https://www.reddit.com/submit?url=${shareUrl}&title=${encodedTitle}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="share-btn reddit"
+        >
+          Reddit
+        </a>
+        <button
+          onClick={() => {
+            navigator.clipboard.writeText(shareUrl);
+            alert("Link copied to clipboard!");
+          }}
+          className="share-btn copy-link"
+        >
+          Copy Link
+        </button>
+      </div>
+      <CommentBox />
+    </div>
+    </>
+  );
+};
+
+export default BlogDetails;
